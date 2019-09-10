@@ -1,0 +1,62 @@
+# For full config options, check the kubeless plugin docs:
+#    https://github.com/serverless/serverless-kubeless
+#
+# For documentation on kubeless itself:
+#    http://kubeless.io
+
+# Update the service name below with your own service name
+service: workbench
+
+provider:
+  name: kubeless
+  runtime: workbench7.2
+  namespace: workbench
+  defaultDNSResolution: 'k8s.kvm'
+  environment:
+    QUEUE_CONNECTION: 'nats'
+    NATS_SERVER: 'nats://nats_client:tOnDjH4oEm@nats-client.nats-system.svc:4222'
+    NATS_TOPIC: workbench-default-topic
+    NATS_DEBUG: true
+  ingress:
+    class: "traefik"
+  deploy:
+    strategy: S3ZipContent
+    options:
+      accessKeyId: minio
+      secretAccessKey: minio123
+      endpoint: http://minio.k8s.kvm
+      bucket: workbench
+      region: eu-central-1
+      s3ForcePathStyle: True
+
+package:
+  exclude:
+    - .idea/**
+    - .git/**
+    - storage/**
+    - node_modules/**
+    - bootstrap/cache/*.php
+    - tests/**
+  include:
+    - storage/app/public/.gitignore
+    - storage/framework/cache/data/.gitignore
+    - storage/framework/sessions/.gitignore
+    - storage/framework/views/.gitignore
+
+plugins:
+  - ./vendor/vognev/laravel-serverless-kubeless/plugin/index.js
+
+functions:
+  website:
+    handler: laravel.website
+    memorySize: 1024
+    cpu: 1000m
+    events:
+      - http:
+          hostname: workbench.k8s.kvm
+  artisan:
+    handler: laravel.artisan
+    memorySize: 1024
+    cpu: 1000m
+    events:
+      - schedule: "* * * * *"

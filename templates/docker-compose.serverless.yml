@@ -1,0 +1,29 @@
+version: '3.4'
+
+x-function: &function
+  image: vognev/kubeless-php
+  volumes:
+    - .:/kubeless
+
+x-gateway: &gateway
+  image: openresty/openresty
+  volumes:
+    - ./storage/serverless/context/gateway.conf:/etc/nginx/conf.d/default.conf
+
+services:
+  artisan:
+    <<: *function
+    environment:
+      KUBELESS_INSTALL_VOLUME: /kubeless
+      FUNC_HANDLER: artisan
+
+  website:
+    <<: *function
+    environment:
+      KUBELESS_INSTALL_VOLUME: /kubeless
+      FUNC_HANDLER: website
+
+  gateway:
+    <<: *gateway
+    links:
+      - website:function

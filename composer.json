@@ -1,0 +1,36 @@
+{
+    "name": "vognev/laravel-serverless-kubeless",
+    "type": "library",
+    "description": "",
+    "require": {
+        "php": ">=7.2.0",
+        "ext-sockets": "*",
+        "ext-json": "*",
+        "ext-apcu": "*",
+        "docker-php/docker-php": "^2.0",
+        "jane-php/open-api-runtime": "^4 <4.3",
+        "pear/archive_tar": "^1.4",
+        "vognev/laravel-serverless": "dev-master",
+        "endclothing/prometheus_client_php": "^1.0",
+        "repejota/nats": "^0.8.7",
+        "nmred/kafka-php": "v0.2.0.8"
+    },
+    "provide": {
+        "vognev/laravel-serverless-impl": "dev-master"
+    },
+    "conflict": {
+        "vognev/laravel-serverless-aws": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laravel\\Serverless\\Kubeless\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Laravel\\Serverless\\Kubeless\\ServerlessServiceProvider"
+            ]
+        }
+    }
+}
