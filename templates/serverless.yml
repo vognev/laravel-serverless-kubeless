@@ -11,12 +11,14 @@ provider:
   name: kubeless
   runtime: workbench7.2
   namespace: workbench
-  defaultDNSResolution: 'k8s.kvm'
   environment:
+    LOG_CHANNEL: 'stderr'
+    #QUEUE_CONNECTION: 'kafka'
+    #KAFKA_QUEUE: 'workbench_default'
+    #KAFKA_BROKERS: 'kafka.kubeless.svc:9092'
     QUEUE_CONNECTION: 'nats'
     NATS_SERVER: 'nats://nats_client:tOnDjH4oEm@nats-client.nats-system.svc:4222'
     NATS_TOPIC: workbench-default-topic
-    NATS_DEBUG: true
   ingress:
     class: "traefik"
   deploy:
@@ -24,7 +26,7 @@ provider:
     options:
       accessKeyId: minio
       secretAccessKey: minio123
-      endpoint: http://minio.k8s.kvm
+      endpoint: http://minio.k3s.kvm
       bucket: workbench
       region: eu-central-1
       s3ForcePathStyle: True
@@ -37,6 +39,7 @@ package:
     - node_modules/**
     - bootstrap/cache/*.php
     - tests/**
+    - vendor/**
   include:
     - storage/app/public/.gitignore
     - storage/framework/cache/data/.gitignore
@@ -53,10 +56,11 @@ functions:
     cpu: 1000m
     events:
       - http:
-          hostname: workbench.k8s.kvm
+          hostname: workbench.k3s.kvm
   artisan:
     handler: laravel.artisan
     memorySize: 1024
     cpu: 1000m
     events:
       - schedule: "* * * * *"
+      #- trigger: 'workbench_default'
